@@ -1,0 +1,30 @@
+from flask import Flask, jsonify
+import mysql.connector
+import os
+
+app = Flask(__name__)
+
+db = mysql.connector.connect(
+    host=os.getenv("MYSQL_HOST"),
+    user=os.getenv("MYSQL_USER"),
+    password=os.getenv("MYSQL_PASSWORD"),
+    database=os.getenv("MYSQL_DB")
+)
+
+cursor = db.cursor(dictionary=True)
+
+@app.route("/")
+def home():
+    return "🍔 Welcome to FoodHub API"
+
+@app.route("/foods")
+def foods():
+    cursor.execute("SELECT * FROM foods")
+    return jsonify(cursor.fetchall())
+
+@app.route("/health")
+def health():
+    return {"status": "healthy"}
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
